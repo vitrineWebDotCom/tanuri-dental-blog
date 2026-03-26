@@ -2,10 +2,15 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+interface Profile {
+  id: string;
+  name: string;
+}
+
 interface AuthContextType {
   session: Session | null;
   user: User | null;
-  profile: { id: string; name: string } | null;
+  profile: Profile | null;
   isAdmin: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -25,46 +30,75 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<{ id: string; name: string } | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 função centralizada e segura
   const fetchUserData = async (userId: string) => {
-    const [profileRes, roleRes] = await Promise.all([
-      supabase.from("profiles").select("id, name").eq("id", userId).single(),
-      supabase.from("user_roles").select("role").eq("user_id", userId),
-    ]);
-    if (profileRes.data) setProfile(profileRes.data);
-    if (roleRes.data) {
-      setIsAdmin(roleRes.data.some((r) => r.role === "admin"));
+    try {
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("id, name")
+        .eq("id", userId)
+        .single();
+
+      if (profileError) throw profileError;
+
+      setProfile(profileData);
+
+      const { data: roles, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+
+      if (roleError) throw roleError;
+
+      const admin = roles?.some((r) => r.role === "admin");
+      setIsAdmin(admin || false);
+    } catch (err) {
+      console.error("Erro ao buscar dados do usuário:", err);
+      setProfile(null);
+      setIsAdmin(false);
     }
   };
 
   useEffect(() => {
+    let isMounted = true;
+
+    const handleSession = async (session: Session | null) => {
+      if (!isMounted) return;
+
+      setSession(session);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser) {
+        await fetchUserData(currentUser.id);
+      } else {
+        setProfile(null);
+        setIsAdmin(false);
+      }
+
+      setLoading(false);
+    };
+
+    // 🔹 listener de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setTimeout(() => fetchUserData(session.user.id), 0);
-        } else {
-          setProfile(null);
-          setIsAdmin(false);
-        }
-        setLoading(false);
+      (_event, session) => {
+        handleSession(session);
       }
     );
 
+    // 🔹 sessão inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserData(session.user.id);
-      }
-      setLoading(false);
+      handleSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
@@ -76,7 +110,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, isAdmin, loading, signOut }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        profile,
+        isAdmin,
+        loading,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

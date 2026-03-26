@@ -1,69 +1,70 @@
-import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import Layout from "@/components/Layout";
-import { ArrowRight, Heart, Shield, Sparkles } from "lucide-react";
+import { ScrollAnimation } from "@/components/scroll-animation";
 
 const Index = () => {
-  return (
-    <Layout>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-cream py-24 lg:py-32">
-        <div className="container relative z-10">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-              <Sparkles className="h-4 w-4" />
-              Excelência em Odontologia
-            </div>
-            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Seu sorriso merece o{" "}
-              <span className="text-primary">melhor cuidado</span>
-            </h1>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Na Odontologia Tanuri, unimos tecnologia de ponta e atendimento humanizado
-              para transformar sorrisos e vidas. Conheça nosso blog e fique por dentro
-              das novidades em saúde bucal.
-            </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button asChild size="lg" className="gap-2">
-                <Link to="/blog">
-                  Acessar Blog <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/register">Criar Conta</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-        {/* Decorative */}
-        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
-      </section>
+  const navigate = useNavigate();
 
-      {/* Features */}
-      <section className="py-20">
-        <div className="container">
-          <h2 className="text-center font-display text-3xl font-bold text-foreground">
-            Por que escolher a <span className="text-primary">Tanuri</span>?
-          </h2>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {[
-              { icon: Heart, title: "Atendimento Humanizado", desc: "Cada paciente é único. Tratamentos personalizados com acolhimento e empatia." },
-              { icon: Shield, title: "Segurança e Qualidade", desc: "Protocolos rigorosos de biossegurança e materiais de alta qualidade." },
-              { icon: Sparkles, title: "Tecnologia Avançada", desc: "Equipamentos de última geração para diagnósticos precisos e tratamentos eficientes." },
-            ].map((f) => (
-              <div key={f.title} className="group rounded-xl border bg-card p-8 text-center transition-shadow hover:shadow-lg">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <f.icon className="h-6 w-6" />
-                </div>
-                <h3 className="font-display text-xl font-semibold text-card-foreground">{f.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </Layout>
+  return (
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#fffefc] via-[#fffdf9] to-[#fffcf6] flex flex-col items-center px-6 py-16">
+
+      {/* Logo */}
+      <div className="w-full flex justify-center mb-12">
+        <img
+          src="public\logo.png"
+          alt="Odontologia Tanuri"
+          className="h-16 md:h-28 object-contain"
+        />
+      </div>
+
+      {/* Conteúdo principal */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-3xl flex flex-col items-center text-center space-y-10"
+      >
+
+        <ScrollAnimation delay={0}>
+          {/* Título */}
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1A1A1A] leading-snug md:leading-relaxed">
+            Explore nosso blog e fique por dentro das novidades em odontologia
+          </h1>
+        </ScrollAnimation>
+
+        <ScrollAnimation delay={100}>
+          {/* Descrição */}
+          <p className="text-[#666666] text-lg md:text-xl leading-relaxed">
+            Descubra artigos sobre saúde bucal, dicas práticas de cuidados e novidades da Odontologia Tanuri.
+          </p>
+        </ScrollAnimation>
+
+        <ScrollAnimation delay={200}>
+          {/* Lista de benefícios */}
+          <ul className="space-y-4 text-[#666666]">
+            <li className="flex items-center justify-center gap-2 text-lg md:text-xl">
+              <span className="text-[#D4AF37] text-2xl">✔</span> Novidades sobre saúde bucal
+            </li>
+            <li className="flex items-center justify-center gap-2 text-lg md:text-xl">
+              <span className="text-[#D4AF37] text-2xl">✔</span> Dicas e cuidados odontológicos
+            </li>
+            <li className="flex items-center justify-center gap-2 text-lg md:text-xl">
+              <span className="text-[#D4AF37] text-2xl">✔</span> Cases e histórias de pacientes
+            </li>
+          </ul>
+        </ScrollAnimation>
+
+        {/* Botão */}
+        <Button
+          onClick={() => navigate("/blog")}
+          className="bg-[#D4AF37] hover:bg-[#b89230] text-white px-10 py-5 rounded-2xl text-lg md:text-xl font-semibold shadow-xl transition-all transform hover:scale-105"
+        >
+          Ver Artigos
+        </Button>
+
+      </motion.div>
+    </div>
   );
 };
 

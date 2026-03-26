@@ -1,7 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,8 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarDays, Trash2, MessageSquare } from "lucide-react";
+import { CalendarDays, Trash2, MessageSquare, ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PostPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -88,7 +88,7 @@ const PostPage = () => {
     return (
       <Layout>
         <div className="container py-12 text-center">
-          <p className="text-muted-foreground">Post não encontrado.</p>
+          <p className="text-[#666666]">Post não encontrado.</p>
         </div>
       </Layout>
     );
@@ -96,25 +96,47 @@ const PostPage = () => {
 
   return (
     <Layout>
-      <article className="container max-w-3xl py-12">
+      {/* Back link */}
+      <div className="container max-w-3xl py-8 px-4 sm:px-0">
+        <Link
+          to="/blog"
+          className="flex items-center gap-2 text-[#D4AF37] font-medium hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" /> Voltar ao blog
+        </Link>
+      </div>
+
+      <article className="container max-w-3xl py-8 px-4 sm:px-0">
         {post.image_url && (
-          <div className="mb-8 overflow-hidden rounded-xl">
-            <img src={post.image_url} alt={post.title} className="w-full object-cover" />
+          <div className="mb-8 overflow-hidden rounded-2xl shadow-md">
+            <img
+              src={post.image_url}
+              alt={post.title}
+              className="w-full object-cover transition-transform duration-300 hover:scale-105"
+            />
           </div>
         )}
-        <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">{post.title}</h1>
-        <div className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">
-          <CalendarDays className="h-4 w-4" />
-          {format(new Date(post.created_at), "d 'de' MMMM, yyyy", { locale: ptBR })}
-          <span>•</span>
+
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#D4AF37]">
+          {post.title}
+        </h1>
+        
+        <div className="mt-3 flex items-center gap-4 text-sm text-[#666666]">
+          <span className="flex items-center gap-1">
+            <CalendarDays className="h-4 w-4" />
+            {format(new Date(post.created_at), "d 'de' MMMM, yyyy", { locale: ptBR })}
+          </span>
           <span>{(post as any).profiles?.name}</span>
         </div>
-        <div className="mt-8 whitespace-pre-wrap text-foreground leading-relaxed">{post.content}</div>
+
+        <div className="mt-6 text-[#1A1A1A] text-lg leading-relaxed whitespace-pre-wrap">
+          {post.content}
+        </div>
 
         {/* Comments */}
         <section className="mt-12 border-t pt-8">
-          <h2 className="flex items-center gap-2 font-display text-2xl font-semibold text-foreground">
-            <MessageSquare className="h-5 w-5 text-primary" />
+          <h2 className="flex items-center gap-2 text-2xl font-semibold text-[#D4AF37]">
+            <MessageSquare className="h-5 w-5 text-[#D4AF37]" />
             Comentários ({comments?.length ?? 0})
           </h2>
 
@@ -132,35 +154,40 @@ const PostPage = () => {
                 onChange={(e) => setComment(e.target.value)}
                 className="min-h-[80px]"
               />
-              <Button type="submit" className="mt-3" disabled={addComment.isPending || !comment.trim()}>
+              <Button
+                type="submit"
+                className="mt-3 bg-[#D4AF37] hover:bg-[#c69c30]"
+                disabled={addComment.isPending || !comment.trim()}
+              >
                 {addComment.isPending ? "Enviando..." : "Comentar"}
               </Button>
             </form>
           )}
 
           {!user && (
-            <p className="mt-4 text-sm text-muted-foreground">
-              Faça <a href="/login" className="text-primary hover:underline">login</a> para comentar.
+            <p className="mt-4 text-sm text-[#666666]">
+              Faça <Link to="/login" className="text-[#D4AF37] hover:underline">login</Link> para comentar.
             </p>
           )}
 
           <div className="mt-6 space-y-4">
             {comments?.map((c) => (
-              <div key={c.id} className="rounded-lg border bg-card p-4">
+              <div key={c.id} className="rounded-2xl border bg-white shadow-sm p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-card-foreground">{(c as any).profiles?.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(c.created_at), "dd/MM/yyyy HH:mm")}
-                    </span>
+                  <span className="text-sm font-medium text-[#1A1A1A]">{(c as any).profiles?.name}</span>
+                  <div className="flex items-center gap-2 text-xs text-[#666666]">
+                    <span>{format(new Date(c.created_at), "dd/MM/yyyy HH:mm")}</span>
                     {user?.id === c.user_id && (
-                      <button onClick={() => deleteComment.mutate(c.id)} className="text-muted-foreground hover:text-destructive">
-                        <Trash2 className="h-3.5 w-3.5" />
+                      <button
+                        onClick={() => deleteComment.mutate(c.id)}
+                        className="hover:text-destructive text-[#D4AF37]"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     )}
                   </div>
                 </div>
-                <p className="mt-2 text-sm text-foreground">{c.content}</p>
+                <p className="mt-2 text-[#1A1A1A] text-sm">{c.content}</p>
               </div>
             ))}
           </div>

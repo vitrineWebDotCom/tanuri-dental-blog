@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+
 import Index from "./pages/Index";
 import Blog from "./pages/Blog";
 import PostPage from "./pages/PostPage";
@@ -17,6 +18,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      {/* Toasters com estilo padronizado */}
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -28,6 +30,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<Admin />} />
+            {/* 404 com Layout padronizado */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

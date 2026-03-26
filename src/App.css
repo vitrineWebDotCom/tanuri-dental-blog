@@ -1,30 +1,59 @@
+/* ==============================
+   ROOT & TIPOGRAFIA
+   ============================== */
+:root {
+  --primary-color: #646cff;
+  --secondary-color: #61dafb;
+  --text-color: #333;
+  --bg-color: #fefefe;
+  --card-bg: #ffffffdd;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --transition: 0.3s ease-in-out;
+  --radius: 1rem;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  margin: 0;
+  padding: 0;
+}
+
+/* ==============================
+   CONTAINER PRINCIPAL
+   ============================== */
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 3rem 2rem;
   text-align: center;
 }
 
+/* ==============================
+   LOGO & ANIMAÇÃO
+   ============================== */
 .logo {
   height: 6em;
   padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  transition: transform var(--transition), filter var(--transition);
+  will-change: transform, filter;
+  cursor: pointer;
+  border-radius: var(--radius);
 }
+
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 2em var(--primary-color)aa);
 }
+
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em var(--secondary-color)aa);
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -33,10 +62,52 @@
   }
 }
 
+/* ==============================
+   CARD MODERNO
+   ============================== */
 .card {
-  padding: 2em;
+  background: var(--card-bg);
+  padding: 2.5em 2em;
+  margin: 2rem auto;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+/* ==============================
+   LINKS E DOCS
+   ============================== */
 .read-the-docs {
   color: #888;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.read-the-docs:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+/* ==============================
+   RESPONSIVIDADE
+   ============================== */
+@media (max-width: 768px) {
+  #root {
+    padding: 2rem 1rem;
+  }
+
+  .logo {
+    height: 5em;
+    padding: 1em;
+  }
+
+  .card {
+    padding: 2em 1.5em;
+  }
 }

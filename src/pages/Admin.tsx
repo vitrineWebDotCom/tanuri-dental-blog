@@ -24,6 +24,7 @@ const Admin = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [openCommentsPostId, setOpenCommentsPostId] = useState<string | null>(null);
 
   // Redirect non-admin
   if (!loading && (!user || !isAdmin)) {
@@ -42,6 +43,27 @@ const Admin = () => {
       return data;
     },
     enabled: isAdmin,
+  });
+
+  const getCommentsByPost = async (postId: string) => {
+    const { data, error } = await supabase
+      .from("comments")
+      .select(`
+        id,
+        content,
+        created_at,
+        user:profiles (name)
+      `)
+      .eq("post_id", postId)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  };
+
+  const { data: comments } = useQuery({
+    queryKey: ["comments", openCommentsPostId],
+    queryFn: () => getCommentsByPost(openCommentsPostId!),
+    enabled: !!openCommentsPostId,
   });
 
   const uploadImage = async (file: File): Promise<string | null> => {
@@ -108,12 +130,18 @@ const Admin = () => {
 
   return (
     <Layout>
-      <section className="bg-cream py-10">
-        <div className="container flex items-center justify-between">
-          <h1 className="font-display text-3xl font-bold text-foreground">Painel Admin</h1>
+      <section className="bg-gradient-to-br from-white via-white to-[#F5F5F5] py-12 lg:py-20 px-8 sm:px-12 lg:px-16">
+        <div className="mx-auto max-w-7x1 text-center">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1A1A1A]">
+            Painel <span className="text-[#D4AF37]">Admin</span>
+          </h1>
+          <p className="mt-4 mb-8 text-lg text-[#666666]">
+            Gerencie posts e comentários do blog odontológico de forma rápida e intuitiva.
+          </p>
+          
           {!showForm && (
             <Button onClick={() => setShowForm(true)} className="gap-2">
-              <Plus className="h-4 w-4" /> Novo Post
+              <Plus className="h-6 w-4" /> Novo Post
             </Button>
           )}
         </div>
@@ -154,24 +182,57 @@ const Admin = () => {
         {isLoading ? (
           <p className="text-muted-foreground">Carregando...</p>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts?.map((post) => (
-              <Card key={post.id}>
-                <CardContent className="flex items-center justify-between py-4">
-                  <div>
-                    <h3 className="font-display text-lg font-semibold text-card-foreground">{post.title}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(post.created_at), "dd/MM/yyyy HH:mm")}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
+              <Card key={post.id} className="overflow-hidden">
+                {post.image_url && (
+                  <img
+                    src={post.image_url}
+                    alt={post.title}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                <CardContent>
+                  <h3 className="font-display text-lg font-semibold mb-1 text-primary">{post.title}</h3>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {format(new Date(post.created_at), "dd/MM/yyyy HH:mm")}
+                  </p>
+                  <div className="flex gap-2 mb-2">
                     <Button variant="outline" size="sm" onClick={() => startEdit(post)}>
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="h-4 w-4" /> Editar
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => deletePost.mutate(post.id)} className="text-destructive hover:text-destructive">
-                      <Trash2 className="h-4 w-4" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deletePost.mutate(post.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" /> Excluir
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setOpenCommentsPostId(openCommentsPostId === post.id ? null : post.id)
+                      }
+                    >
+                      Ver comentários
                     </Button>
                   </div>
+
+                  {openCommentsPostId === post.id && (
+                    <div className="mt-2 p-2 border rounded-lg">
+                      {comments?.length === 0 && (
+                        <p className="text-sm text-muted-foreground">Nenhum comentário ainda.</p>
+                      )}
+                      {comments?.map((c) => (
+                        <div key={c.id} className="mb-2 border-b pb-2">
+                          <p className="text-sm font-semibold">{c.user?.name ?? "Usuário"}</p>
+                          <p className="text-sm">{c.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
