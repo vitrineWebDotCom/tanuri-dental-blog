@@ -12,7 +12,7 @@ const Index = () => {
       {/* Logo */}
       <div className="w-full flex justify-center mb-12">
         <img
-          src="src/assets/logo.png"
+          src="/assets/logo.png"
           alt="Odontologia Tanuri"
           className="h-16 md:h-28 object-contain"
         />
@@ -55,13 +55,23 @@ const Index = () => {
           </ul>
         </ScrollAnimation>
 
-        {/* Botão */}
-        <Button
-          onClick={() => navigate("/blog")}
-          className="bg-[#D4AF37] hover:bg-[#b89230] text-white px-10 py-5 rounded-2xl text-lg md:text-xl font-semibold shadow-xl transition-all transform hover:scale-105"
-        >
-          Ver Artigos
-        </Button>
+        {/* Botões */}
+        <div className="flex flex-col sm:flex-row gap-6 mt-6">
+          <Button
+            onClick={() => navigate("/blog")}
+            className="bg-[#D4AF37] hover:bg-[#b89230] text-white px-10 rounded-2xl text-lg md:text-xl font-semibold shadow-xl transition-all transform hover:scale-105 h-[60px] flex items-center justify-center"
+          >
+            Ver Artigos
+          </Button>
+
+          <Button
+            onClick={() => window.location.href = "https://odontologia-tanuri-website-v10.vercel.app/"}
+            variant="outline"
+            className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#fff7e0] hover:text-[#b89230] px-10 rounded-2xl text-lg md:text-xl font-semibold shadow transition-all h-[60px] flex items-center justify-center"
+          >
+            Voltar ao Site
+          </Button>
+        </div>
 
       </motion.div>
     </div>
