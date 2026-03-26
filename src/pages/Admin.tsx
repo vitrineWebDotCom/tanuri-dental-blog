@@ -193,7 +193,7 @@ const Admin = () => {
                   />
                 )}
                 <CardContent>
-                  <h3 className="font-display text-lg font-semibold mb-1 text-primary">{post.title}</h3>
+                  <h3 className="font-display text-lg font-semibold mb-4 mt-4 text-primary">{post.title}</h3>
                   <p className="text-xs text-muted-foreground mb-2">
                     {format(new Date(post.created_at), "dd/MM/yyyy HH:mm")}
                   </p>
