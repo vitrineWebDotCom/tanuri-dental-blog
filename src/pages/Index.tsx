@@ -65,7 +65,7 @@ const Index = () => {
           </Button>
 
           <Button
-            onClick={() => window.location.href = "https://odontologia-tanuri-website-v10.vercel.app/"}
+            onClick={() => window.location.href = "https://www.odontologiatanuri.com.br/"}
             variant="outline"
             className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#fff7e0] hover:text-[#b89230] px-10 rounded-2xl text-lg md:text-xl font-semibold shadow transition-all h-[60px] flex items-center justify-center"
           >
