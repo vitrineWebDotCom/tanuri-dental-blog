@@ -12,7 +12,7 @@ const Index = () => {
       {/* Logo */}
       <div className="w-full flex justify-center mb-12">
         <img
-          src="/assets/logo.png"
+          src="/assets/logo_header.png"
           alt="Odontologia Tanuri"
           className="h-16 md:h-28 object-contain"
         />
