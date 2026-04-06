@@ -1,12 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,       // ajuste pro nome das suas env vars
-  process.env.VITE_SUPABASE_ANON_KEY
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
 );
 
 export default async function handler(req, res) {
-  // Chave secreta pra ninguém chamar esse endpoint à toa
   if (req.headers['x-ping-secret'] !== process.env.PING_SECRET) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
